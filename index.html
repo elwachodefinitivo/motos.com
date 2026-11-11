@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Motos deportivas por marca</title>
+<meta name="description" content="Los modelos más conocidos de las principales marcas de motos deportivas, con cilindrada y potencia aproximada.">
+<style>
+:root{color-scheme:light dark;--bg:#eceef1;--panel:#fff;--text:#13161b;--muted:#5d6470;--line:#d5d9df}
+@media(prefers-color-scheme:dark){:root{--bg:#121418;--panel:#1b1e24;--text:#eef0f3;--muted:#9aa1ad;--line:#2d323b}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 "Bahnschrift","Segoe UI",system-ui,sans-serif}
+header,main{max-width:1120px;margin:0 auto;padding:0 1.25rem}
+header{padding-top:3rem;padding-bottom:1.75rem}
+h1{font-size:clamp(2.3rem,7vw,4.4rem);line-height:1;font-weight:800;letter-spacing:-.03em;margin:0;max-width:11ch}
+header p{color:var(--muted);max-width:52ch;margin:1rem 0 0}
+:focus-visible{outline:3px solid #3b82f6;outline-offset:2px}
+
+.layout{display:grid;gap:1.25rem;padding-bottom:2rem}
+#brands{display:flex;gap:.4rem;overflow-x:auto;padding-bottom:.25rem}
+#brands button{flex:none;display:flex;justify-content:space-between;align-items:center;gap:1rem;border:0;border-left:5px solid var(--c);border-radius:0 6px 6px 0;background:var(--panel);color:var(--text);padding:.6rem .85rem;font:inherit;cursor:pointer}
+#brands button.on{background:var(--c);color:#fff}
+#brands small{opacity:.7}
+@media(min-width:820px){
+  .layout{grid-template-columns:230px 1fr;align-items:start}
+  #brands{position:sticky;top:1rem;flex-direction:column;overflow:visible}
+}
+
+.tools{display:flex;flex-wrap:wrap;gap:.6rem;margin-bottom:.75rem}
+input,select{font:inherit;color:var(--text);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:.6rem .8rem}
+input{flex:1;min-width:180px}
+#count{color:var(--muted);margin:0 0 .75rem}
+
+section{background:var(--panel);border-radius:8px;margin-bottom:1.25rem;overflow:hidden}
+h2{margin:0;padding:1rem 1.1rem;background:var(--c);color:#fff;display:flex;justify-content:space-between;align-items:baseline;font-size:1.7rem;font-weight:800;letter-spacing:-.01em}
+h2 small{font-size:1rem;font-weight:500;opacity:.85}
+ul{list-style:none;margin:0;padding:0}
+.row{display:grid;grid-template-columns:1fr 6rem 11rem;gap:.5rem 1rem;align-items:center;padding:.85rem 1.1rem;border-top:1px solid var(--line);border-left:5px solid var(--c)}
+.row:first-child{border-top:0}
+.nm b{display:block;font-size:1.25rem;font-weight:700;letter-spacing:-.01em}
+.nm div{display:flex;gap:.6rem;color:var(--muted);font-size:.9rem}
+.bd{color:var(--text);font-weight:700}
+.cc{color:var(--muted);font-variant-numeric:tabular-nums}
+.hp em{display:block;font-style:normal;font-weight:700;font-variant-numeric:tabular-nums;margin-bottom:.25rem}
+.bar{height:10px;background:repeating-linear-gradient(90deg,var(--line) 0 5px,transparent 5px 8px)}
+.bar i{display:block;height:100%;width:var(--w);background:repeating-linear-gradient(90deg,var(--c) 0 5px,transparent 5px 8px);animation:fill .7s ease-out}
+@keyframes fill{from{width:0}}
+@media(prefers-reduced-motion:reduce){.bar i{animation:none}}
+@media(max-width:640px){.row{grid-template-columns:1fr 1fr}.nm{grid-column:1/-1}}
+.empty{background:var(--panel);border-radius:8px;padding:1.25rem;color:var(--muted)}
+footer{color:var(--muted);font-size:.85rem;padding-bottom:3rem}
+</style>
+</head>
+<body>
+<header>
+  <h1>Motos deportivas por marca</h1>
+  <p>Los modelos más conocidos de nueve marcas, con cilindrada y potencia aproximada. Elige una marca, busca por nombre u ordena por potencia.</p>
+</header>
+
+<main>
+  <div class="layout">
+    <nav id="brands" aria-label="Marcas"></nav>
+    <div>
+      <div class="tools">
+        <input id="q" type="search" placeholder="Buscar modelo, por ejemplo R1 o Panigale" aria-label="Buscar modelo">
+        <select id="sort" aria-label="Ordenar">
+          <option value="marca">Agrupar por marca</option>
+          <option value="hp">Más potentes primero</option>
+          <option value="cc">Mayor cilindrada primero</option>
+        </select>
+      </div>
+      <p id="count" aria-live="polite"></p>
+      <div id="list"></div>
+    </div>
+  </div>
+  <footer>Potencia y cilindrada aproximadas: cambian según el año, la versión y el mercado. Para datos exactos, consulta la ficha oficial de cada fabricante.</footer>
+</main>
+
+<script>
+// Para añadir una marca o un modelo, edita esta lista.
+// Marca: [nombre, país, color, [modelos]]   Modelo: [nombre, categoría, cc, CV aprox.]
+const B=[
+["Yamaha","Japón","#1f3fa8",[["YZF-R1","Superdeportiva",998,200],["YZF-R6","Superdeportiva",599,118],["YZF-R7","Deportiva",689,73],["MT-09","Naked",890,119],["YZF-R3","Iniciación",321,42],["YZF-R125","Iniciación",125,15]]],
+["Honda","Japón","#e0202c",[["CBR1000RR-R Fireblade","Superdeportiva",999,217],["CBR600RR","Superdeportiva",599,118],["CBR650R","Deportiva",649,95],["CBR500R","Iniciación",471,47],["CBR125R","Iniciación",125,13]]],
+["Kawasaki","Japón","#3b8a1a",[["Ninja H2","Superdeportiva",998,231],["Ninja ZX-10R","Superdeportiva",998,203],["Ninja ZX-6R","Superdeportiva",636,128],["Ninja ZX-4RR","Deportiva",399,77],["Ninja 650","Deportiva",649,68],["Ninja 400","Iniciación",399,45]]],
+["Suzuki","Japón","#0a78c2",[["GSX-R1000R","Superdeportiva",999,202],["Hayabusa","Deportiva",1340,190],["GSX-R750","Superdeportiva",750,148],["GSX-R600","Superdeportiva",599,125],["GSX-8R","Deportiva",776,82],["GSX-R125","Iniciación",125,15]]],
+["Ducati","Italia","#a50d25",[["Panigale V4","Superdeportiva",1103,215],["1299 Panigale","Superdeportiva",1285,205],["Panigale V2","Superdeportiva",955,155],["Streetfighter V4","Naked",1103,208],["Supersport 950","Deportiva",937,110],["916","Superdeportiva",916,114]]],
+["BMW","Alemania","#1c69d4",[["M 1000 RR","Superdeportiva",999,212],["S 1000 RR","Superdeportiva",999,210],["S 1000 R","Naked",999,165],["F 900 R","Naked",895,105],["G 310 R","Iniciación",313,34]]],
+["KTM","Austria","#d84a00",[["1290 Super Duke R","Naked",1301,180],["RC 8C","Superdeportiva",889,128],["890 Duke R","Naked",889,121],["RC 390","Iniciación",373,44],["RC 125","Iniciación",125,15]]],
+["Aprilia","Italia","#565b68",[["RSV4","Superdeportiva",1099,217],["Tuono V4","Naked",1077,175],["RS 660","Deportiva",659,100],["RS 457","Iniciación",457,47],["RS 125","Iniciación",125,15]]],
+["Triumph","Reino Unido","#0d6b4f",[["Speed Triple 1200 RS","Naked",1160,180],["Street Triple RS","Naked",765,130],["Daytona 675","Superdeportiva",675,126],["Daytona 660","Deportiva",660,95]]]
+];
+
+const $=s=>document.querySelector(s);
+const all=B.flatMap(([b,,c,ms])=>ms.map(([n,cat,cc,hp])=>({b,c,n,cat,cc,hp})));
+const MAXHP=Math.max(...all.map(x=>x.hp));
+let brand="all",q="",sort="marca";
+
+function nav(){
+  const items=[["all","Todas las marcas","#4b5563",all.length],...B.map(([b,,c,ms])=>[b,b,c,ms.length])];
+  $("#brands").innerHTML=items.map(([k,t,c,n])=>
+    `<button class="${k===brand?"on":""}" data-k="${k}" style="--c:${c}"><span>${t}</span><small>${n}</small></button>`).join("");
+}
+
+const row=(x,flat)=>`<li class="row" style="--c:${x.c};--w:${(x.hp/MAXHP*100).toFixed(1)}%">
+  <div class="nm"><b>${x.n}</b><div>${flat?`<span class="bd">${x.b}</span>`:""}<span>${x.cat}</span></div></div>
+  <div class="cc">${x.cc} cc</div>
+  <div class="hp"><em>${x.hp} CV</em><div class="bar"><i></i></div></div></li>`;
+
+function render(){
+  nav();
+  const l=all.filter(x=>(brand==="all"||x.b===brand)&&`${x.b} ${x.n} ${x.cat}`.toLowerCase().includes(q));
+  let out="";
+  if(sort==="marca"){
+    B.forEach(([b,p,c])=>{
+      const g=l.filter(x=>x.b===b);
+      if(g.length) out+=`<section style="--c:${c}"><h2>${b}<small>${p}</small></h2><ul>${g.map(x=>row(x,false)).join("")}</ul></section>`;
+    });
+  }else{
+    l.sort((a,z)=>sort==="hp"?z.hp-a.hp:z.cc-a.cc);
+    if(l.length) out=`<section><ul>${l.map(x=>row(x,true)).join("")}</ul></section>`;
+  }
+  $("#list").innerHTML=out||`<p class="empty">Ningún modelo coincide con la búsqueda. Prueba con otro nombre o cambia de marca.</p>`;
+  $("#count").textContent=`${l.length} ${l.length===1?"modelo":"modelos"}`;
+}
+
+$("#brands").addEventListener("click",e=>{
+  const b=e.target.closest("button");
+  if(b){brand=b.dataset.k;render();}
+});
+$("#q").addEventListener("input",e=>{q=e.target.value.trim().toLowerCase();render();});
+$("#sort").addEventListener("change",e=>{sort=e.target.value;render();});
+render();
+</script>
+</body>
+</html>
